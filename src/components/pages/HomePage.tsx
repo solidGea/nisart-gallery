@@ -88,25 +88,25 @@ export const HomePage: React.FC = () => {
           </p>
 
           {/* Action buttons */}
-          <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <Link to="/gallery" className="group">
+          <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center items-center max-w-lg mx-auto">
+            <Link to="/gallery" className="group w-full sm:w-auto">
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full blur-lg opacity-70 group-hover:opacity-100 transition-all duration-300 animate-pulse"></div>
-                <Button size="lg" className="relative bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white border-0 px-8 py-4 rounded-full shadow-2xl transform hover:scale-105 transition-all duration-300">
-                  <Grid className="h-6 w-6 mr-2" />
-                  <span className="font-bold text-lg">Explore Gallery</span>
-                  <ArrowRight className="h-6 w-6 ml-2 group-hover:translate-x-1 transition-transform" />
+                <Button size="lg" className="relative bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white border-0 px-8 md:px-12 lg:px-16 py-4 md:py-5 lg:py-6 rounded-full shadow-2xl transform hover:scale-105 transition-all duration-300 w-full sm:w-auto min-w-[200px] md:min-w-[280px] lg:min-w-[320px]">
+                  <Grid className="h-5 w-5 md:h-6 md:w-6 mr-3 md:mr-4" />
+                  <span className="font-bold text-base md:text-lg lg:text-xl whitespace-nowrap">Explore Gallery</span>
+                  <ArrowRight className="h-5 w-5 md:h-6 md:w-6 ml-3 md:ml-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </div>
             </Link>
             
-            <Link to="/upload" className="group">
+            <Link to="/upload" className="group w-full sm:w-auto">
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full blur-lg opacity-70 group-hover:opacity-100 transition-all duration-300"></div>
-                <Button variant="outline" size="lg" className="relative bg-black/20 border-2 border-cyan-400 text-cyan-300 hover:bg-cyan-500/20 hover:text-white px-8 py-4 rounded-full transform hover:scale-105 transition-all duration-300">
-                  <Camera className="h-6 w-6 mr-2" />
-                  <span className="font-bold text-lg">Share Your Art</span>
-                  <Star className="h-5 w-5 ml-2 group-hover:rotate-180 transition-transform duration-500" />
+                <Button variant="outline" size="lg" className="relative bg-black/20 border-2 border-cyan-400 text-cyan-300 hover:bg-cyan-500/20 hover:text-white px-8 md:px-12 lg:px-16 py-4 md:py-5 lg:py-6 rounded-full transform hover:scale-105 transition-all duration-300 w-full sm:w-auto min-w-[200px] md:min-w-[280px] lg:min-w-[320px]">
+                  <Camera className="h-5 w-5 md:h-6 md:w-6 mr-3 md:mr-4" />
+                  <span className="font-bold text-base md:text-lg lg:text-xl whitespace-nowrap">Share Your Art</span>
+                  <Star className="h-4 w-4 md:h-5 md:w-5 ml-3 md:ml-4 group-hover:rotate-180 transition-transform duration-500" />
                 </Button>
               </div>
             </Link>

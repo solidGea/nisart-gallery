@@ -211,7 +211,7 @@ export const ImageDetailPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="text-center py-16 text-white bg-black/20 backdrop-blur-sm min-h-screen">
-        <div>DEBUG: Loading state - ID: {id}</div>
+        <div>Loading Image - ID: {id}</div>
         <div
           role="status"
           aria-label="Loading"
@@ -225,7 +225,7 @@ export const ImageDetailPage: React.FC = () => {
   if (errorMessage) {
     return (
       <div className="text-center py-12 text-white bg-black/20 backdrop-blur-sm min-h-screen">
-        <div>DEBUG: Error state - ID: {id}</div>
+        <div>Error state - ID: {id}</div>
         <h1 className="text-2xl font-bold mb-4">Server Error</h1>
         <p className="text-red-300 mb-6" role="alert" aria-live="polite">{errorMessage}</p>
         <div className="flex items-center justify-center space-x-3">
@@ -241,7 +241,7 @@ export const ImageDetailPage: React.FC = () => {
   if (!image) {
     return (
       <div className="text-center py-12 text-white bg-black/20 backdrop-blur-sm min-h-screen">
-        <div>DEBUG: No image state - ID: {id}, Loading: {isLoading}, Error: {errorMessage}</div>
+        <div>No image state - ID: {id}, Loading: {isLoading}, Error: {errorMessage}</div>
         <h1 className="text-2xl font-bold mb-4">Image Not Found</h1>
         <p className="text-gray-300 mb-6">The image you're looking for doesn't exist.</p>
         <Link to="/gallery">

@@ -43,7 +43,7 @@ export const LoginPage: React.FC = () => {
         <div className="flex items-center justify-center min-h-screen -mt-20">
           <div className="bg-black/40 backdrop-blur-sm border border-white/10 rounded-lg shadow-2xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Welcome to NisArt Gallery</h1>
+          <h1 className="text-2xl font-bold text-white mb-2">Welcome to NisArt Gallery</h1>
           <p className="text-gray-300">Sign in with your Google account to continue</p>
         </div>
 

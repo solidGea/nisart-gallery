@@ -5,6 +5,7 @@ import { getApiBase } from '../../lib/api';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Badge } from '../ui/Badge';
+import { Skeleton } from '../ui/skeleton';
 import type { Image } from '../../types';
 import { SEOHead } from '../seo/SEOHead';
 import { Breadcrumb, breadcrumbConfigs } from '../seo/Breadcrumb';
@@ -18,6 +19,7 @@ export const SearchPage: React.FC = () => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [searchResults, setSearchResults] = useState<Image[]>([]);
   const [isSearching, setIsSearching] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [categories, setCategories] = useState<any[]>([]);
   const [allTags, setAllTags] = useState<string[]>([]);
 
@@ -105,6 +107,10 @@ export const SearchPage: React.FC = () => {
           ]);
           setSearchResults([]);
         }
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
       }
     }
     load();
@@ -147,6 +153,7 @@ export const SearchPage: React.FC = () => {
         console.error('Search failed', err);
       } finally {
         setIsSearching(false);
+        setIsLoading(false);
       }
     }, 300);
 
@@ -216,7 +223,7 @@ export const SearchPage: React.FC = () => {
         
         {/* Header */}
         <div>
-        <h1 className="text-3xl font-bold text-white">Search Images</h1>
+        <h1 className="text-2xl font-bold text-white">Search Images</h1>
         <p className="text-gray-300 mt-1">
           Find images by title, description, or tags
         </p>
@@ -356,15 +363,19 @@ export const SearchPage: React.FC = () => {
             )}
           </h2>
 
-          {isSearching ? (
+          {isLoading || isSearching ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {/* Loading skeleton */}
-              {[...Array(8)].map((_, i) => (
+              {Array.from({ length: 12 }).map((_, i) => (
                 <div key={i} className="bg-black/40 backdrop-blur-sm rounded-lg shadow-xl border border-white/10 overflow-hidden">
-                  <div className="w-full h-48 bg-gray-700 animate-pulse" />
+                  <Skeleton className="w-full h-48" />
                   <div className="p-4">
-                    <div className="h-4 bg-gray-600 rounded animate-pulse mb-2" />
-                    <div className="h-3 bg-gray-600 rounded animate-pulse w-2/3" />
+                    <Skeleton className="h-4 w-3/4 mb-2" />
+                    <Skeleton className="h-3 w-1/2 mb-2" />
+                    <div className="flex gap-1">
+                      <Skeleton className="h-5 w-16" />
+                      <Skeleton className="h-5 w-12" />
+                    </div>
                   </div>
                 </div>
               ))}

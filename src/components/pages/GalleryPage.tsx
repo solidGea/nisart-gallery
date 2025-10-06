@@ -11,6 +11,7 @@ import { SEOHead } from '../seo/SEOHead';
 import { GallerySchema } from '../seo/StructuredData';
 import { Breadcrumb, breadcrumbConfigs } from '../seo/Breadcrumb';
 import { gallerySEO, generateCategorySEO } from '../seo/seoConfig';
+import { Skeleton } from '../ui/skeleton';
 
 export const GalleryPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -22,6 +23,7 @@ export const GalleryPage: React.FC = () => {
   const [categories, setCategories] = useState<any[]>([]);
   const [page, setPage] = useState<number>(parseInt(searchParams.get('page') || '1'));
   const [total, setTotal] = useState<number | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const LIMIT = 12;
 
   // Lightweight inline placeholder (SVG) used when thumbnail is missing or fails to load
@@ -88,6 +90,8 @@ export const GalleryPage: React.FC = () => {
         console.warn('Failed to fetch images', err);
         setImages([]);
         setTotal(0);
+      } finally {
+        setIsLoading(false);
       }
     }
 
@@ -259,7 +263,7 @@ export const GalleryPage: React.FC = () => {
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-white">Image Gallery</h1>
+          <h1 className="text-2xl font-bold text-white">Image Gallery</h1>
           <p className="text-gray-600 mt-1">
             Showing {filteredImages.length}{total ? ` of ${total}` : ''} images
           </p>
@@ -271,6 +275,7 @@ export const GalleryPage: React.FC = () => {
             variant={viewMode === 'grid' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => setViewMode('grid')}
+            className="touch-manipulation min-h-[44px] min-w-[44px]"
           >
             <Grid className="h-4 w-4" />
           </Button>
@@ -278,6 +283,7 @@ export const GalleryPage: React.FC = () => {
             variant={viewMode === 'list' ? 'default' : 'ghost'}
             size="sm"
             onClick={() => setViewMode('list')}
+            className="touch-manipulation min-h-[44px] min-w-[44px]"
           >
             <List className="h-4 w-4" />
           </Button>
@@ -305,7 +311,7 @@ export const GalleryPage: React.FC = () => {
           <Button
             variant="outline"
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center space-x-2"
+            className="flex items-center space-x-2 touch-manipulation min-h-[44px]"
           >
             <Filter className="h-4 w-4" />
             <span>Filters</span>
@@ -323,7 +329,7 @@ export const GalleryPage: React.FC = () => {
                 <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => handleCategoryChange('all')}
-                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                    className={`px-3 py-2 rounded-full text-sm font-medium transition-colors touch-manipulation min-h-[44px] ${
                       selectedCategory === 'all'
                         ? 'bg-blue-600 text-white'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -335,7 +341,7 @@ export const GalleryPage: React.FC = () => {
                     <button
                       key={category.id}
                       onClick={() => handleCategoryChange(category.name)}
-                      className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                      className={`px-3 py-2 rounded-full text-sm font-medium transition-colors touch-manipulation min-h-[44px] ${
                         selectedCategory === category.name
                           ? 'bg-blue-600 text-white'
                           : 'bg-black/30 text-gray-300 hover:bg-black/50 border border-white/10'
@@ -357,111 +363,151 @@ export const GalleryPage: React.FC = () => {
           ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6'
           : 'space-y-4'
       }>
-  {filteredImages.map((image) => (
-          <div
-            key={image.id}
-            className={
-              viewMode === 'grid'
-                ? 'group bg-black/40 backdrop-blur-sm rounded-lg shadow-xl border border-white/10 overflow-hidden hover:shadow-2xl transition-all duration-300'
-                : 'flex bg-black/40 backdrop-blur-sm rounded-lg shadow-xl border border-white/10 overflow-hidden hover:shadow-2xl transition-all duration-300'
-            }
-          >
-            {/* Image */}
-            <div 
-              className={`relative cursor-pointer ${viewMode === 'grid' ? 'aspect-w-1 aspect-h-1' : 'w-48 flex-shrink-0'}`}
-              onClick={() => window.location.href = `/image/${image.id}`}
+        {isLoading ? (
+          // Skeleton loading state
+          Array.from({ length: 12 }).map((_, index) => (
+            <div
+              key={`skeleton-${index}`}
+              className={
+                viewMode === 'grid'
+                  ? 'bg-black/40 backdrop-blur-sm rounded-lg shadow-xl border border-white/10 overflow-hidden'
+                  : 'flex bg-black/40 backdrop-blur-sm rounded-lg shadow-xl border border-white/10 overflow-hidden'
+              }
             >
-              <img
-                src={resolveApiUrl(image.thumbnailUrl) || PLACEHOLDER_SVG}
-                alt={image.title}
-                onError={(e) => {
-                  try {
-                    (e.currentTarget as HTMLImageElement).src = PLACEHOLDER_SVG;
-                  } catch (err) {
-                    // ignore
-                  }
-                }}
-                className={`
-                  object-cover group-hover:scale-105 transition-transform duration-300
-                  ${viewMode === 'grid' ? 'w-full h-48' : 'w-full h-32'}
-                `}
-              />
-              
-              {/* Action Buttons Overlay - Always positioned in top-right */}
-              <div className={`absolute top-2 right-2 flex space-x-1 transition-opacity duration-200 ${
-                viewMode === 'list' 
-                  ? 'opacity-100' 
-                  : 'opacity-0 group-hover:opacity-100'
-              }`}>
-                <IconButton to={`/image/${image.id}`} ariaLabel="view image">
-                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path d="M12 5C7 5 3 9 3 12s4 7 9 7 9-4 9-7-4-7-9-7zm0 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4z" />
-                  </svg>
-                </IconButton>
-                {image.downloadable && (
-                  <IconButton ariaLabel="download" onClick={() => handleDownload(image)}>
-                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                      <path d="M12 16l-4-4h3V4h2v8h3l-4 4z" />
-                      <path d="M20 18v2H4v-2h16z" />
-                    </svg>
-                  </IconButton>
+              {/* Image Skeleton */}
+              <div 
+                className={`relative ${viewMode === 'grid' ? 'aspect-w-1 aspect-h-1' : 'w-48 flex-shrink-0'}`}
+              >
+                <Skeleton className={`${viewMode === 'grid' ? 'w-full h-48' : 'w-full h-32'}`} />
+              </div>
+
+              {/* Content Skeleton */}
+              <div className={`p-4 ${viewMode === 'list' ? 'flex-1 flex flex-col justify-between' : ''}`}>
+                <div>
+                  <Skeleton className="h-4 w-3/4 mb-2" />
+                  {viewMode === 'list' && <Skeleton className="h-3 w-full mb-2" />}
+                  <div className="flex gap-1 mb-2">
+                    <Skeleton className="h-5 w-16" />
+                    <Skeleton className="h-5 w-12" />
+                  </div>
+                  <Skeleton className="h-3 w-1/2" />
+                </div>
+                {viewMode === 'list' && (
+                  <div className="mt-3 pt-3 border-t border-white/10">
+                    <Skeleton className="h-8 w-full" />
+                  </div>
                 )}
               </div>
             </div>
-
-            {/* Content */}
-            <div className={`p-4 ${viewMode === 'list' ? 'flex-1 flex flex-col justify-between' : ''}`}>
-              <div>
-                <div className="mb-2">
-                  <h3 className="font-semibold text-white truncate">{image.title}</h3>
-                </div>
-
-              {viewMode === 'list' && image.description && (
-                <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-                  {image.description}
-                </p>
-              )}
-
-              <div className="flex flex-wrap gap-1 mb-2">
-                <Badge variant="secondary" className="text-xs">
-                  {categories.find(cat => cat.id === image.category)?.name}
-                </Badge>
-                {image.tags.slice(0, 2).map((tag) => (
-                  <Badge key={tag} variant="outline" className="text-xs">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-
-                <div className="text-xs text-gray-500">
-                  {image.photographer && <span>by {image.photographer}</span>}
-                  {image.width && image.height && (
-                    <span className="ml-2">
-                      {image.width}×{image.height}
-                    </span>
+          ))
+        ) : (
+          // Actual images
+          filteredImages.map((image) => (
+            <div
+              key={image.id}
+              className={
+                viewMode === 'grid'
+                  ? 'group bg-black/40 backdrop-blur-sm rounded-lg shadow-xl border border-white/10 overflow-hidden hover:shadow-2xl transition-all duration-300'
+                  : 'flex bg-black/40 backdrop-blur-sm rounded-lg shadow-xl border border-white/10 overflow-hidden hover:shadow-2xl transition-all duration-300'
+              }
+            >
+              {/* Image */}
+              <div 
+                className={`relative cursor-pointer ${viewMode === 'grid' ? 'aspect-w-1 aspect-h-1' : 'w-48 flex-shrink-0'}`}
+                onClick={() => window.location.href = `/image/${image.id}`}
+              >
+                <img
+                  src={resolveApiUrl(image.thumbnailUrl) || PLACEHOLDER_SVG}
+                  alt={image.title}
+                  onError={(e) => {
+                    try {
+                      (e.currentTarget as HTMLImageElement).src = PLACEHOLDER_SVG;
+                    } catch (err) {
+                      // ignore
+                    }
+                  }}
+                  className={`
+                    object-cover group-hover:scale-105 transition-transform duration-300
+                    ${viewMode === 'grid' ? 'w-full h-48' : 'w-full h-32'}
+                  `}
+                />
+                
+                {/* Action Buttons Overlay - Always positioned in top-right */}
+                <div className={`absolute top-2 right-2 flex space-x-1 transition-opacity duration-200 ${
+                  viewMode === 'list' 
+                    ? 'opacity-100' 
+                    : 'opacity-0 group-hover:opacity-100'
+                }`}>
+                  <IconButton to={`/image/${image.id}`} ariaLabel="view image">
+                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path d="M12 5C7 5 3 9 3 12s4 7 9 7 9-4 9-7-4-7-9-7zm0 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4z" />
+                    </svg>
+                  </IconButton>
+                  {image.downloadable && (
+                    <IconButton ariaLabel="download" onClick={() => handleDownload(image)}>
+                      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M12 16l-4-4h3V4h2v8h3l-4 4z" />
+                        <path d="M20 18v2H4v-2h16z" />
+                      </svg>
+                    </IconButton>
                   )}
                 </div>
               </div>
-              
-              {/* View Details Button for List View */}
-              {viewMode === 'list' && (
-                <div className="mt-3 pt-3 border-t border-white/10">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      window.location.href = `/image/${image.id}`;
-                    }}
-                    className="w-full text-xs"
-                  >
-                    View Details
-                  </Button>
+
+              {/* Content */}
+              <div className={`p-4 ${viewMode === 'list' ? 'flex-1 flex flex-col justify-between' : ''}`}>
+                <div>
+                  <div className="mb-2">
+                    <h3 className="font-semibold text-white truncate">{image.title}</h3>
+                  </div>
+
+                {viewMode === 'list' && image.description && (
+                  <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                    {image.description}
+                  </p>
+                )}
+
+                <div className="flex flex-wrap gap-1 mb-2">
+                  <Badge variant="secondary" className="text-xs">
+                    {categories.find(cat => cat.id === image.category)?.name}
+                  </Badge>
+                  {image.tags.slice(0, 2).map((tag) => (
+                    <Badge key={tag} variant="outline" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
                 </div>
-              )}
+
+                  <div className="text-xs text-gray-500">
+                    {image.photographer && <span>by {image.photographer}</span>}
+                    {image.width && image.height && (
+                      <span className="ml-2">
+                        {image.width}×{image.height}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                
+                {/* View Details Button for List View */}
+                {viewMode === 'list' && (
+                  <div className="mt-3 pt-3 border-t border-white/10">
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.location.href = `/image/${image.id}`;
+                      }}
+                      className="w-full text-xs"
+                    >
+                      View Details
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       {/* Empty State */}
@@ -482,16 +528,20 @@ export const GalleryPage: React.FC = () => {
           variant="outline"
           onClick={() => setPage((p) => Math.max(1, p - 1))}
           disabled={page <= 1}
+          className="touch-manipulation min-h-[44px] px-4"
         >
           Prev
         </Button>
 
-        <div className="text-sm text-gray-700">Page {page}{total ? ` of ${Math.max(1, Math.ceil(total / LIMIT))}` : ''}</div>
+        <div className="text-sm text-gray-700 px-4 py-2 bg-black/20 rounded-lg">
+          Page {page}{total ? ` of ${Math.max(1, Math.ceil(total / LIMIT))}` : ''}
+        </div>
 
         <Button
           variant="outline"
           onClick={() => setPage((p) => p + 1)}
           disabled={total !== null && page >= Math.ceil(total / LIMIT)}
+          className="touch-manipulation min-h-[44px] px-4"
         >
           Next
         </Button>

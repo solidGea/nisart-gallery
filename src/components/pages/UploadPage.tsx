@@ -284,7 +284,7 @@ export const UploadPage: React.FC = () => {
 
         {/* Header */}
         <div>
-        <h1 className="text-3xl font-bold text-white">Upload Images</h1>
+        <h1 className="text-2xl font-bold text-white">Upload Images</h1>
         <p className="text-gray-600 mt-1">
           Share your images with the community. Maximum file size: {formatFileSize(MAX_FILE_SIZE)}
         </p>

@@ -6,6 +6,7 @@ import { getApiBase } from '../../lib/api';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Badge } from '../ui/Badge';
+import { Skeleton } from '../ui/skeleton';
 import { SEOHead } from '../seo/SEOHead';
 import { Breadcrumb } from '../seo/Breadcrumb';
 import type { Image } from '../../types';
@@ -266,7 +267,7 @@ export const MyImagesPage: React.FC = () => {
         {/* Header */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-white">My Images</h1>
+            <h1 className="text-2xl font-bold text-white">My Images</h1>
             <p className="text-gray-300 mt-1">
               Manage your uploaded artwork - {filteredImages.length} image{filteredImages.length !== 1 ? 's' : ''}
             </p>
@@ -311,11 +312,19 @@ export const MyImagesPage: React.FC = () => {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="bg-black/30 border border-white/10 text-white rounded-md px-3 py-2 text-sm"
+                className="bg-black/60 border border-white/20 text-white rounded-md px-3 py-2 text-sm focus:bg-black/80 focus:border-white/30 hover:bg-black/70 transition-colors"
+                style={{
+                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                  color: 'white'
+                }}
               >
-                <option value="all">All Categories</option>
+                <option value="all" style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)', color: 'white' }}>All Categories</option>
                 {categories.map((category) => (
-                  <option key={category.id} value={category.name}>
+                  <option
+                    key={category.id}
+                    value={category.name}
+                    style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)', color: 'white' }}
+                  >
                     {category.name}
                   </option>
                 ))}
@@ -344,12 +353,16 @@ export const MyImagesPage: React.FC = () => {
         {/* Images Grid */}
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {[...Array(8)].map((_, i) => (
+            {Array.from({ length: 12 }).map((_, i) => (
               <div key={i} className="bg-black/40 backdrop-blur-sm rounded-lg shadow-xl border border-white/10 overflow-hidden">
-                <div className="w-full h-48 bg-gray-700 animate-pulse" />
+                <Skeleton className="w-full h-48" />
                 <div className="p-4">
-                  <div className="h-4 bg-gray-600 rounded animate-pulse mb-2" />
-                  <div className="h-3 bg-gray-600 rounded animate-pulse w-2/3" />
+                  <Skeleton className="h-4 w-3/4 mb-2" />
+                  <Skeleton className="h-3 w-1/2 mb-2" />
+                  <div className="flex gap-1">
+                    <Skeleton className="h-5 w-16" />
+                    <Skeleton className="h-5 w-12" />
+                  </div>
                 </div>
               </div>
             ))}

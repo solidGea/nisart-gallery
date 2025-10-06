@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import getApiBase from '../../lib/api';
+import { Skeleton } from './skeleton';
 
 type StatsData = {
   totalImages: number;
@@ -130,25 +131,43 @@ export const Stats: React.FC = () => {
       {/* Recent uploads carousel */}
       <div className="mt-6">
         <h3 className="text-lg font-bold text-white mb-3">Recent Uploads</h3>
-        {stats.recentUploads && stats.recentUploads.length > 0 ? (
+        {loading ? (
           <div className="flex space-x-4 overflow-x-auto pb-4 -mx-2 px-2">
-            {stats.recentUploads.map((u) => (
-              <Link
-                to={`/image/${u.id}`}
-                key={u.id}
-                className="relative w-44 flex-shrink-0 rounded-2xl overflow-hidden bg-black/20 border border-white/10"
-              >
-                <img
-                  src={`${getApiBase()}/images/${u.id}/thumbnail`}
-                  alt={u.title}
-                  className="w-full h-28 object-cover"
-                />
-                <div className="p-3">
-                  <div className="text-sm font-semibold text-white truncate">{u.title || 'Untitled'}</div>
-                  <div className="text-xs text-gray-400">{new Date(u.created_at).toLocaleDateString()}</div>
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="relative w-44 flex-shrink-0 rounded-2xl overflow-hidden bg-black/20 border border-white/10">
+                <Skeleton className="w-full h-28" />
+                <div className="p-3 space-y-2">
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-3 w-1/2" />
                 </div>
-              </Link>
+              </div>
             ))}
+          </div>
+        ) : stats.recentUploads && stats.recentUploads.length > 0 ? (
+          <div className="relative overflow-hidden">
+            <div className="flex animate-scroll-right-to-left">
+              {/* Duplicate the items for seamless loop */}
+              {[...stats.recentUploads, ...stats.recentUploads].map((u, index) => (
+                <Link
+                  to={`/image/${u.id}`}
+                  key={`${u.id}-${index}`}
+                  className="relative w-44 flex-shrink-0 mx-2 rounded-2xl overflow-hidden bg-black/20 border border-white/10 hover:border-purple-400/50 transition-all duration-300"
+                >
+                  <img
+                    src={`${getApiBase()}/images/${u.id}/thumbnail`}
+                    alt={u.title}
+                    className="w-full h-28 object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjE0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGR5PSIuM2VtIiBmaWxsPSIjODg4IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjE0Ij5Ob8gaW1hZ2U8L3RleHQ+PC9zdmc+';
+                    }}
+                  />
+                  <div className="p-3">
+                    <div className="text-sm font-semibold text-white truncate">{u.title || 'Untitled'}</div>
+                    <div className="text-xs text-gray-400">{new Date(u.created_at).toLocaleDateString()}</div>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
         ) : (
           <div className="text-sm text-gray-400">No recent uploads yet.</div>

@@ -178,14 +178,22 @@ export const EditImageModal: React.FC<EditImageModalProps> = ({
               id="category"
               value={formData.category}
               onChange={handleInputChange('category')}
-              className={`w-full px-3 py-2 bg-black/30 border rounded-md text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
                 errors.category ? 'border-red-500' : 'border-white/10'
               }`}
+              style={{
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                color: 'white'
+              }}
               disabled={isLoading}
             >
-              <option value="">Select a category</option>
+              <option value="" style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)', color: 'white' }}>Select a category</option>
               {categories.map((category) => (
-                <option key={category.id} value={category.name}>
+                <option 
+                  key={category.id} 
+                  value={category.name}
+                  style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)', color: 'white' }}
+                >
                   {category.name}
                 </option>
               ))}
