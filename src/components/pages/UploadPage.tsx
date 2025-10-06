@@ -39,6 +39,7 @@ export const UploadPage: React.FC = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
+  const [categoriesLoaded, setCategoriesLoaded] = useState(false);
 
   // Load categories from API
   useEffect(() => {
@@ -60,17 +61,42 @@ export const UploadPage: React.FC = () => {
         // Fallback to static categories if API fails
         setCategories([
           { id: 1, name: 'Traditional' },
-          { id: 2, name: 'Digital' }         
+          { id: 2, name: 'Digital' }
         ]);
+      } finally {
+        setCategoriesLoaded(true);
       }
     };
     
     loadCategories();
   }, []);
 
+  // Update file categories when categories are loaded
+  useEffect(() => {
+    if (categoriesLoaded && categories.length > 0) {
+      setUploadedFiles(prev => 
+        prev.map(file => {
+          // If the current category is not in the loaded categories, update it
+          const isValidCategory = categories.some(cat => cat.name === file.category);
+          if (!isValidCategory) {
+            console.log('Updating invalid category:', file.category, 'to', categories[0].name);
+            return { ...file, category: categories[0].name };
+          }
+          return file;
+        })
+      );
+    }
+  }, [categoriesLoaded, categories]);
+
   // Get default category (first available or fallback)
   const getDefaultCategory = () => {
-    return categories.length > 0 ? categories[0].name : 'nature';
+    const defaultCat = categories.length > 0 ? categories[0].name : 'Traditional';
+    console.log('getDefaultCategory called:', { 
+      categoriesCount: categories.length, 
+      categories: categories.map(c => c.name), 
+      returning: defaultCat 
+    });
+    return defaultCat;
   };
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -99,6 +125,11 @@ export const UploadPage: React.FC = () => {
   }, []);
 
   const processFiles = async (files: File[]) => {
+    console.log('processFiles called:', { 
+      filesCount: files.length, 
+      categoriesLoaded, 
+      categoriesCount: categories.length 
+    });
     for (const file of files) {
       const validation = validateFile(file);
       const id = generateImageId();
@@ -165,6 +196,15 @@ export const UploadPage: React.FC = () => {
           prev.map(f => f.id === id ? { ...f, progress: progress.percentage } : f)
         );
       };
+
+      // Validate category before upload
+      const isValidCategory = categories.some(cat => cat.name === uploadedFile.category);
+      if (!isValidCategory) {
+        console.warn('Invalid category detected:', uploadedFile.category, 'Available:', categories.map(c => c.name));
+        throw new Error(`Invalid category: ${uploadedFile.category}`);
+      }
+
+      console.log('Uploading with category:', uploadedFile.category, 'Available categories:', categories.map(c => c.name));
 
       // Upload the file
       const response = await UploadService.uploadImagesWithProgress(
